@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+
+  <script>
+
+    function cl(){
+      console.log.apply(this, arguments);
+    }
+
+    // 5. 寄生式继承
+    // 特点：创建一个仅用于封装继承过程的函数，该函数在内部以某种方式来增强对象，最后再像真的是它做了所有工作一样返回对象。
+    // 思路：与原型式继承紧密相关。
+    // 优点：
+    // 缺点：
+
+    function object(o){
+      function F(){}
+      F.prototype = o;
+      return new F();
+    }
+
+    function createHuman(original){
+      var clone = object(original); // 通过调用函数创建一个新对象
+      clone.sayHi = function(){
+        console.log('hi');
+      }
+      clone.numbers = [1, 2, 3];
+      return clone;
+    }
+
+    var Human = {
+      name: 'Gold',
+      human_property: 'human_property',
+      colors: ['red', 'blue', 'green']
+    }
+
+    var man = createHuman(Human);
+    cl(man); // F {}
+    cl(man.name); // Gold
+    cl(man.hasOwnProperty('name')); // false
+    cl(man.constructor); // ƒ Object() { [native code] 
+    cl(man.__proto__); // {name: "Gold", human_property: "human_property", colors: Array(3)}
+    man.colors.push('black');
+    
+    var woman = createHuman(Human);
+    cl(woman); // F {}
+    cl(woman.name); // Gold
+    cl(woman.hasOwnProperty('name')); // false
+    cl(woman.constructor); // ƒ Object() { [native code] 
+    cl(woman.__proto__); // {name: "Gold", human_property: "human_property", colors: Array(3)}
+
+    var Adam = Object.create(Human, {
+      age: {
+        writable: true,
+        value: 20
+      }
+    });
+    cl(Adam);
+    Adam.age = 8;
+    cl(Adam.age);
+    
+  </script>
+  
+</body>
+</html>

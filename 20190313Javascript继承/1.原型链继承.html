@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+
+  <script>
+
+    // 1. 原型链继承（实践中很少会单独使用原型链）
+    // 特点：只要是原型链中出现过的原型，都可以说是该原型链所派生的实例的原型，因此 isPrototypeOf()方法也会返回 true
+    // 缺点：
+    //    1. 包含引用类型的原型属性会被所有实例共享，如colors，因为 jack 和 jason 虽然指向两个不同的
+    //    2. 在创建子类的实例时，不能像超类的构造函数传递参数
+    function Human(){
+      this.human_property = true;
+      this.colors = ['red', 'blue', 'green'];
+    }
+    Human.prototype.getHumanProperty = function(){
+      return this.human_property;
+    }
+
+    function Man(){
+      this.man_property = false;
+      this.numbers = [1, 2, 3];
+    }
+    Man.prototype = new Human(); // 继承
+    Man.prototype.getManProperty = function(){
+      return this.man_property;
+    }
+
+    let jack = new Man();
+    console.log(jack); // Man {man_property: false, numbers: Array(3)}
+    console.log(jack.__proto__ === Man.prototype); // true
+    console.log(jack.constructor); // Human(){ this.human_property = true;this.colors = ['red', 'blue', 'green']; }
+    // hasOwnProperty 判断属性是否属于自身属性而不是原型链上属性
+    console.log(jack.hasOwnProperty('human_property')); // false
+    console.log(jack.hasOwnProperty('man_property')); // true
+    jack.colors.push('black');
+    jack.numbers.push(4);
+
+    let jason = new Man();
+
+    console.log(jack.colors); // ["red", "blue", "green", "black"]
+    console.log(jason.colors); // ["red", "blue", "green", "black"]
+    console.log(jack.numbers); // [1, 2, 3, 4]
+    console.log(jason.numbers); // [1, 2, 3]
+
+    console.log(jack.constructor); // Human函数，为什么不是Man？？？
+    console.log(jack.__proto__); // Human实例
+    console.log(jack.constructor === Human); // Human函数
+    console.log(jack.constructor); // Human函数
+
+    function A(){
+      this.a = 1
+    }
+
+    function B(){
+      this.a = 2
+    }
+    B.prototype = new A(); // 继承A
+
+    function C(){
+      this.a = 3
+    }
+    C.prototype = new B(); // 继承B
+
+    function D(){
+      this.a = 4
+    }
+    D.prototype = new C(); // 继承C
+    console.log(D.prototype) // A {a: 3}
+
+    function E(){
+      this.a = 5
+    }
+    E.prototype = new D(); // 继承D
+    console.log(E.prototype) // A {a: 4}
+
+    let aaa = new E();
+    console.log(aaa) // E {a: 5}
+    console.log(aaa.constructor) // A(){ this.a = 1 } 这是因为原来 E.prototype D.prototype ... 中的 constructor 被重写了的缘故
+    // 《JavaScript高级程序设计》 p.164 实际上，不是 SubType 的原型的 constructor 属性被重写了，而是 SubType 的原型指向了另一个对象—— SuperType 的原型，而这个原型对象的 constructor 属性指向的是 SuperType。
+    console.log(aaa instanceof B); // true 说 instance 是 Object、A 或 B... 中任何一个类型的实例
+    console.log(B.prototype.isPrototypeOf(aaa)); // true 只要是原型链中出现过的原型，都可以说是该原型链所派生的实例的原型，因此 isPrototypeOf()方法也会返回 true
+
+
+
+
+   /*  // 2. 借用构造函数（经典继承）???
+    function Person(name){
+      this.name = name;
+      this.colors = ['red', 'blue', 'green'];
+    }
+
+    let person = new Person('张三'); // 以 Person 为原型构造函数，那么 person 的构造器就是 Person
+    console.log(person.constructor === Person); // true
+    console.log(person instanceof Person); // true
+    console.log(person.prototype); // undefined
+    console.log(person.constructor); // Person
+    console.log(person.__proto__); // {constructor: ƒ}
+    person.colors.push('black');
+
+    let person2 = new Person('李四');
+    console.log(person.colors); // ["red", "blue", "green", "black"]
+    console.log(person2.colors); // ["red", "blue", "green"]
+ */
+  </script>
+  
+</body>
+</html>

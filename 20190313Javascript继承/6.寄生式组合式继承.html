@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+
+  <script>
+
+    function cl(){
+      console.log.apply(this, arguments);
+    }
+
+    // 6. 寄生组合式继承
+    // 通过借用构造函数来继承属性，通过原型链的混成形式来继承方法。
+    // 思路：不必为了指定子类型的原型而调用超类型的构造函数，我们所需要的无非就是超类型原型的一个副本而已。
+    // 特点：使用寄生式继承来继承超类型的原型，然后再将结果指定给子类型的原型。
+    // 优点：
+    //    1. 这个例子的高效率体现在它只调用了一次 SuperType 构造函数，并且因此避免了在 SubType.prototype 上面创建不必要的、多余的属性；
+    //    2. 原型链还能保持不变；
+    //    3. 超类型的引用类型不会受到其他实例影响。
+    // 缺点：
+
+    function object(o){
+      function F(){}
+      F.prototype = o;
+      return new F();
+    }
+
+    function inheritPrototype(subType, superType){
+      var prototype = object(superType.prototype);  // 创建对象，（寄生式继承）通过调用函数创建一个新对象，获得超类型（Human）的一个副本，这个副本的参数即使是引用类型也不会被其他实例污染
+      // cl(prototype)
+      /* __proto__:
+        getHumanProperty: ƒ ()
+        constructor: ƒ Human(name)
+        __proto__: Object */
+      prototype.constructor = subType;              // 增加对象，获得子类型的属性和方法，从而弥补因重写原型而失去的默认的 constructor 属性
+      // cl(prototype)
+      /* constructor: ƒ Man(name)
+      __proto__:
+        getHumanProperty: ƒ ()
+        constructor: ƒ Human(name)
+        __proto__: Object */
+      subType.prototype = prototype;                // 指定对象，将新创建的对象（即副本）赋值给子类型的原型。
+      // cl(prototype)
+      /* Human {constructor: ƒ}
+        constructor: ƒ Man(name)
+        __proto__: Object */
+    }
+
+    function Human(name){
+      this.name = name + '_human';
+      this.human_property = 'human_property';
+      this.colors = ['red', 'blue', 'green'];
+    }
+
+    Human.prototype.getHumanProperty = function(){
+      return this.human_property;
+    }
+
+    function Man(name){
+      this.man_property = 'man_property';
+      this.numbers = [1, 2, 3];
+      // “借调”了超类型的构造函数（借用构造函数继承）
+      // 这样没有Man实例自身就具有Human的colors属性的副本了，而且互不影响
+      Human.call(this, name); // 这句话的意义只是通过借用构造函数来获取超类型Human的属性，当前获得的Human的方法会被inheritPrototype重写
+      // cl(this.name);
+      // cl(this.colors);
+      // cl(this.getHumanProperty());
+    }
+    Man.prototype.getManProperty = function(){
+      return this.man_property;
+    }
+
+    // cl(Man.prototype);
+    /* getManProperty: ƒ ()
+    constructor: ƒ Man(name)
+    __proto__: Object */
+    inheritPrototype(Man, Human); // 对Man的原型进行重写，通过man.getManProperty()可以进行证明
+    // cl(Man.prototype);
+    /* Human {constructor: ƒ}
+        constructor: ƒ Man(name)
+        __proto__: Object */
+
+    var man = new Man('亚当');
+   /*  cl(man); // Man {man_property: "man_property", numbers: Array(3), name: "亚当_human", human_property: "human_property", colors: Array(3)}
+    cl(man.name); // 亚当_human
+    cl(man.hasOwnProperty('name')); // true
+    cl(man.constructor); // Man
+    cl(man.constructor.prototype); // Human {constructor: ƒ}
+    cl(man.__proto__); // Human {constructor: ƒ}
+    man.colors.push('black');
+    cl(man.colors); // ["red", "blue", "green", "black"]
+    man.numbers.push(4);
+    cl(man.numbers); // [1, 2, 3, 4] */
+    // cl(man.getManProperty()); //  man.getManProperty is not a function
+    
+    var woman = new Man('夏娃');
+   /*  cl(woman); // Man {man_property: "man_property", numbers: Array(3), name: "夏娃_human", human_property: "human_property", colors: Array(3)}
+    cl(woman.name); // 夏娃_human
+    cl(woman.hasOwnProperty('name')); // true
+    cl(woman.constructor); // Man
+    cl(woman.__proto__); // Human {constructor: ƒ}
+    cl(woman.colors); // ["red", "blue", "green"]
+    cl(woman.numbers); // [1, 2, 3] */
+
+    // var Adam = Object.create(Human, {
+    //   age: {
+    //     writable: true,
+    //     value: 20
+    //   }
+    // });
+    // cl(Adam);
+    // Adam.age = 8;
+    // cl(Adam.age);
+    
+  </script>
+  
+</body>
+</html>

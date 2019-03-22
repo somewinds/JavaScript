@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+
+  <script>
+
+    function cl(){
+      console.log.apply(this, arguments);
+    }
+
+    // 3. 组合继承（伪经典继承）
+    // 特点：将原型链和借用构造函数的技术组合到一块。
+    // 思路：使用原型链实现对原型属性和方法的继承，而通过借用构造函数来实现对实例属性的继承。
+    // 优点：既通过在原型上定义方法实现了函数复用，又能保证每个实例都有他自己的属性。
+    function Human(name){
+      this.name = name + '_human';
+      this.human_property = 'human_property';
+      this.colors = ['red', 'blue', 'green'];
+    }
+    Human.prototype.getHumanProperty = function(){
+      return this.human_property;
+    }
+
+    // 在子类型构造函数的内部调用超类型构造函数
+    function Man(){
+      this.man_property = 'man_property';
+      this.numbers = [1, 2, 3];
+      // 使用call，继承了 Human 的属性，可以说是 “借调”了超类型的构造函数
+      // 这样没有Man实例自身就具有Human的colors属性的副本了，而且互不影响
+      Human.call(this, '张三');
+      // 相对于原型链，借用构造函数可以在子类型构造函数中向超类型构造函数传递参数
+    }
+    Man.prototype = new Human(); // 继承 Human 原型的属性和方法（存在于__proto__中），实现函数复用
+    Man.prototype.constructor = Man; // 重写constructor
+    Man.prototype.getManProperty = function(){
+      return this.man_property;
+    }
+
+    let jack = new Man();
+    console.log(jack); // Man {man_property: "man_property", numbers: Array(3), name: "张三_human", human_property: "human_property", colors: Array(3)}
+    console.log(jack instanceof Man); // true
+    console.log(jack instanceof Human); // true
+    console.log(Man.constructor); // Function
+    console.log(jack.getManProperty()); // man_property
+    console.log(jack.getHumanProperty()); // human_property
+    
+    cl(jack.constructor)
+
+    let jason = new Man();
+    console.log(jason); // Man {man_property: "man_property", numbers: Array(3), name: "张三_human", human_property: "human_property", colors: Array(3)}
+
+  </script>
+  
+</body>
+</html>
