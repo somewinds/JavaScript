@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  
+</body>
+
+  <script>
+    
+    function cl(){
+      console.log.apply(console, arguments);
+    }
+
+    // 寄生构造函数模式
+    function Woman(name, age, job){
+      var o = new Object();
+      o.name = name;
+      o.age = age;
+      o.job = job;
+      o.colors = ['red', 'green', 'blue'];
+      o.sayName = function(){
+        cl(this.name);
+      }
+      return o;
+    }
+    var Eva = new Woman('Eva', 18, 'student');
+    cl(Eva); // {name: "Eva", age: 18, job: "student", colors: Array(3), sayName: ƒ}
+
+    // 6. 稳妥构造函数模式
+    // 所谓稳妥对象，指的是没有公共属性，而且其方法也不引用 this 的对象。
+    // 稳妥构造函数遵循与寄生构造函数类似的模式，但有两点不同：
+    //    1. 新创建对象的实例方法不引用 this；
+    //    2. 不使用 new 操作符调用构造函数。
+    // 稳妥对象最适合在一些安全的环境中（这些环境中会禁止使用 this 和 new），或者在防止数据被其他应用程序（如 Mashup程序）改动时使用。
+    function Person(name, age, job){
+      // 创建要返回的对象
+      var o = new Object();
+
+      // 可以在这里定义私有变量和函数
+
+      // 添加方法
+      o.sayName = function(){
+        cl(name);
+      }
+      
+      // 返回对象
+      return o;
+    }
+
+    var friend = Person('Nicholas', 18, 'student');
+    cl(friend); // {sayName: ƒ}
+    friend.sayName(); // Nicholas
+
+    var person1 = new Person('张三', 18, 'student');
+    cl(person1); // {sayName: ƒ}
+
+  </script>
+</html>
