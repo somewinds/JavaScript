@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  
+  <script>
+
+    function cl(){
+      console.log.apply(console, arguments);
+    }
+
+    // 4. 组合使用构造函数模式和原型模式
+    // 构造函数模式用于定义实例属性，而原型模式用于定义方法和共享的属性。
+    // 这样，每个实例都会有自己的一份实例属性的副本，但同时又共享着对方法的引用，最大限度地节省了内存。另外，这种混成模式还支持向构造函数传递参数。
+    // 目前在ECMAScript中使用最广泛、认同度最高的一种创建自定义类型的方法
+
+    function Human(name, age, job){
+      this.name = name;
+      this.age = age;
+      this.job = job;
+      this.colors = ['red', 'green', 'blue'];
+    }
+
+    Human.prototype = {
+      constructor: Human,
+      sayName: function(){
+        cl(this.name);
+      }
+    }
+
+    let Adam = new Human('Adam', 18, 'student');
+
+    let Eva = new Human('Eva', 18, 'student');
+
+    Adam.colors.push('black');
+
+    cl(Adam); // Human {name: "Adam", age: 18, job: "student", colors: Array(4)}
+    cl(Eva); // Human {name: "Eva", age: 18, job: "student", colors: Array(3)}
+    cl(Adam.colors); // ["red", "green", "blue", "black"]
+    cl(Eva.colors); // ["red", "green", "blue"]
+    Adam.sayName(); // Adam
+    cl(Adam.sayName === Eva.sayName); // true
+
+
+  </script>
+</body>
+</html>

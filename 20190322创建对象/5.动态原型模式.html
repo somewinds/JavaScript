@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  
+  <script>
+
+    function cl(){
+      console.log.apply(console, arguments);
+    }
+    
+    // 5. 动态原型模式
+    // 它把所有信息都封装在了构造函数中，而通过在构造函数中初始化原型（仅在必要的情况下），又保持了同时使用构造函数和原型的优点。
+    function Human(name, age, job){
+      this.name = name;
+      this.age = age;
+      this.job = job;
+      this.colors = ['red', 'green', 'blue'];
+
+      // 方法，判断有无这个方法，没有则添加，即初次调用构造函数才会执行
+      if(typeof this.sayName !== 'function'){
+        cl('初次调用构造函数才会执行');
+        Human.prototype.sayName = function(){
+          cl(this.name);
+        }
+      }
+    }
+
+    var Adam = new Human('Adam', 18, 'student');
+
+    let Eva = new Human('Eva', 18, 'student');
+
+    Adam.colors.push('black');
+
+    cl(Adam); // Human {name: "Adam", age: 18, job: "student", colors: Array(4)}
+    cl(Eva); // Human {name: "Eva", age: 18, job: "student", colors: Array(3)}
+    cl(Adam.colors); // ["red", "green", "blue", "black"]
+    cl(Eva.colors); // ["red", "green", "blue"]
+    Adam.sayName(); // Adam
+    cl(Adam.sayName === Eva.sayName); // true
+
+  </script>
+</body>
+</html>
